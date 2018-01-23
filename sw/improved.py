@@ -12,11 +12,11 @@ def binary_treshold(image):
 
 
 def adaptive_threshold(image):
-    return cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 3)
+    return cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 5)
 
 
 def gaussian_threshold(image):
-    return cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 3)
+    return cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
 
 def reverse_threshold(image):
@@ -32,7 +32,7 @@ def otsu_threshold_blurring(image):
     return cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
 def reverse_gaussian_threshold(image):
-    image = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 3)
+    image = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     return 255 - image
 
 def non_thresholded(image):
@@ -46,14 +46,12 @@ def scan(cap, thresholding_function):
         # Image processing, sharpening, etc
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = thresholding_function(gray)
- 
+
         test_image = gray.copy()
-        # cv2.line(test_image, (320, 480), (960, 480), (255, 0, 0), 2)
+        cv2.line(test_image, (320, 480), (960, 480), (255, 0, 0), 2)
         # Display the resulting frame
         cv2.imshow('frame', test_image)
-
         p = cv2.waitKey(1)
-
         if p & 0xFF == ord('q'):
             print("Taking picture for tessaract evaluation")
             return gray
@@ -82,13 +80,13 @@ def scan(cap, thresholding_function):
             print("Changed thresholding to otsu with blurring")
             thresholding_function = gaussian_threshold
 
-        elif p & 0xFF == ord('d'):
-            print("Changed thresholding to reverse gaussian")
-            thresholding_function = reverse_gaussian_threshold
-
         elif p & 0xFF == ord('n'):
             print("No thresholding")
             thresholding_function = non_thresholded
+
+        elif p & 0xFF == ord('h'):
+            print("Reverse gaussian")
+            thresholding_function = reverse_gaussian_threshold
 
 
 def deskew_text(image):
@@ -131,17 +129,12 @@ def deskew_text(image):
 
     # show the output image
     print("[INFO] angle: {:.3f}".format(angle))
-    cv2.imshow("Input", image)
-    cv2.imshow("Rotated", rotated)
-    cv2.waitKey(0)
     return rotated
 
 
 def main():
     port = 0
     cap = cv2.VideoCapture(port)
-    #cap.set(3, 1200)
-    #cap.set(4, 900)
     name = time.strftime("%H_%M_%S")
     img = "{}.jpg".format(name)
 
@@ -151,7 +144,7 @@ def main():
     print("Do you wish to try rotating your image using a deskewing function?")
     print("This is advised only if your text was contained in a box (your text had borders on each side)"\
           "and you used binary thresholding")
-    nb = input("Apply deskewing? y/n: ")
+    nb = input("Apply deskewing? y/n")
     if nb == 'y':
         image = cv2.imread(img)
         image = deskew_text(image)
@@ -160,13 +153,13 @@ def main():
 
 
 
-    print("\nAttempting to retrieve text from scanned picture, this might take a while for bigger documents\n")
+    cap.release()
+    cv2.destroyAllWindows()
+    print("\nAttempting to retrieve text from scanned picture, this might take a while for bigger documents")
     text = pytesseract.image_to_string(Image.open(img))
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     print(text)
 
-    cap.release()
-    cv2.destroyAllWindows()
 
 
 main()
