@@ -46,19 +46,7 @@ def scan(cap, thresholding_function):
         # Image processing, sharpening, etc
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = thresholding_function(gray)
-        # check to see if we should apply threshold+
-        # ing to preprocess the
-        # image
-        # if args["preprocess"] == "thresh":
-        #     gray = cv2.threshold(gray, 0, 255,
-        #                          cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-        #
-        # # make a check to see if median blurring should be done to remove
-        # # noise
-        # elif args["preprocess"] == "blur":
-        #     gray = cv2.medianBlur(gray, 3)
-
-
+ 
         test_image = gray.copy()
         # cv2.line(test_image, (320, 480), (960, 480), (255, 0, 0), 2)
         # Display the resulting frame
