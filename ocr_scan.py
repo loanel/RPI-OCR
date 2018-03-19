@@ -1,9 +1,7 @@
 from PIL import Image
 import time
 import pytesseract
-import argparse
 import cv2
-import os
 import numpy as np
 
 
@@ -51,6 +49,7 @@ def scan(cap, thresholding_function):
         cv2.line(test_image, (320, 480), (960, 480), (255, 0, 0), 2)
         # Display the resulting frame
         cv2.imshow('frame', test_image)
+
         p = cv2.waitKey(1)
         if p & 0xFF == ord('q'):
             print("Taking picture for tessaract evaluation")
@@ -150,7 +149,6 @@ def main():
         image = deskew_text(image)
         img = "{}.jpg".format(name + "DESKEWED")
         cv2.imwrite(img, image)
-
 
 
     cap.release()
